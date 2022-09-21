@@ -1,0 +1,85 @@
+<?php
+$escape = $this->plugin('escapeHtml');
+$translate = $this->plugin('translate');
+
+$this->htmlElement('body')->appendAttribute('class', 'item resource browse');
+
+$query = $this->params()->fromQuery();
+
+$sortHeadings = [
+    [
+        'label' => $translate('Identifier'),
+        'value' => 'dcterms:identifier'
+    ],
+    [
+        'label' => $translate('Title'),
+        'value' => 'dcterms:title'
+    ],
+    [
+        'label' => $translate('Created'),
+        'value' => 'created'
+    ],
+    [
+        'label' => $translate('Type'),
+        'value' => 'dcterms:type'
+    ],
+];
+
+?>
+<?php if (isset($itemSet)): ?>
+
+<?php $this->htmlElement('body')->appendAttribute('class', 'item-set');
+    $query['item_set_id'] = $itemSet->id(); ?>
+<!--<?php $template = 'omeka/site/item-set/browse.phtml'; ?>
+<?= $this->partial($template, $this->vars()) ?> -->
+
+<?php endif; ?>
+<?php echo $this->searchFilters(); ?>
+
+<div class="browse-controls">
+    <?php echo $this->pagination(); ?>
+    <center><?php echo $this->hyperlink($translate('Advanced search'), $this->url('site/resource', ['controller' => 'item', 'action' => 'search'], ['query' => $query], true), ['class' => 'advanced-search']); ?></center>
+    <?php echo $this->sortSelector($sortHeadings); ?>
+</div>
+
+<table>
+    <tbody>
+        <tr>
+        <th>Title</th>
+        <th class="noMobile">Class</th>
+        <th class="noMobile">Type</th>
+        <th class="noMobile">Description</th>
+        <th class="noMobile">Date (object)</th>
+        <th class="noMobile">Creation Date (document)</th>
+        </tr>
+    <?php foreach ($items as $item): ?>
+        <tr>
+        <td><b><?php echo $item->link($item->value('dcterms:title')); ?></b></td>
+        <td class="noMobile"><i><?php echo $item->displayResourceClassLabel(); ?></i></td>
+        <td class="noMobile"><?php echo $item->value('dcterms:type'); ?></td>
+        <td class="noMobile"><?php if ($description = $item->value('dcterms:description')): ?>
+        <?php echo mb_substr(strip_tags($description),0,60); ?>
+        <?php if (strlen($description) > 59) {
+            echo $item->link('...');
+            }
+        ?>
+        <?php endif; ?>
+        </td>
+        <td class="noMobile">
+        <?php if ($date = $item->value('dcterms:date')): ?>
+        <?php echo $date; ?>
+        <?php endif; ?>
+        </td>
+        <td class="noMobile">
+        <?php if ($created = $item->value('dcterms:created')): ?>
+        <?php echo $created; ?>
+        <?php endif; ?>
+        </td>
+        </tr>
+    <?php endforeach; ?>
+</tbody>
+</table>
+
+<?php echo $this->pagination(); ?>
+
+<?php $this->trigger('view.browse.after'); ?>

@@ -1,0 +1,78 @@
+<?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+
+$fragment = 'item-linked';
+if ('Omeka\Api\Representation\ItemSetRepresentation' === get_class($objectResource)) {
+    $fragment = 'item-set-linked';
+}
+$pagination = $this->pagination(null, $totalCount, $page, $perPage);
+$pagination->setFragment($fragment);
+?>
+<div id="toggleLinked" onclick="toggleLinked()"><i class="fa fa-plus"></i></div>
+<div id="linked-resources">
+<div class="linked-header">
+    <div id="linked-filter">
+        <h4><?php echo $translate('Filter by property'); ?></h4>
+        <select id="filter-property" name="property" data-url="<?php echo $escape($this->url(null, [], true)); ?>" data-fragment="<?php echo $escape($fragment); ?>">
+            <option value=""><?php echo $translate('All'); ?></option>
+            <?php foreach ($properties as $prop): ?>
+            <option value="<?php echo $escape($prop->id()); ?>"<?php echo $prop->id() == $property ? ' selected="selected"' : ''; ?>><?php echo $escape(sprintf('%s (%s)', $prop->label(), $prop->term())); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <?php echo ($totalCount > $perPage) ? $pagination : ''; ?>
+</div>
+
+<?php foreach ($subjectValues as $term => $values): ?>
+<table>
+<caption class="linked-resource-property"><?php echo $escape($this->translate($values[0]->property()->label())); ?></caption>
+<thead>
+</thead>
+<tbody>
+    <?php foreach ($values as $value): ?>
+    <?php
+    $template = $value->resource()->resourceTemplate();
+    $templateProperty = $template ? $template->resourceTemplateProperty($value->property()->id()) : null;
+    $altLabel = $templateProperty ? $templateProperty->alternateLabel() : null;
+    ?>
+    <tr class="linked-resource">
+        <td><a href="<?php echo $value->resource()->url(); ?>" target="_blank"><?php echo $value->resource()->displayTitle(); ?></a></td>
+        <td>
+    </tr>
+    <?php endforeach; ?>
+</tbody>
+</table>
+<?php endforeach; ?>
+
+<?php echo ($totalCount > $perPage) ? '<div class="linked-footer">' . $pagination . '</div>' : ''; ?>
+
+</div>
+
+<script>
+$('#filter-property').on('change', function(e) {
+    var thisSelect = $(this);
+    var property = thisSelect.find(':selected').val();
+    var url = thisSelect.data('url');
+    var fragment = thisSelect.data('fragment');
+    window.location = url + '?' + $.param({property: property}) + '#' + fragment;
+});
+
+if ($("#linked-resources caption").length == 1) {
+    $("#linked-resources").show();
+    $("#toggleLinked").html("<i class='fa fa-minus'></i>");
+} else {
+    $("#linked-resources").hide();
+    $("#toggleLinked").html("<i class='fa fa-plus'></i>");
+}
+
+function toggleLinked() {
+    $("#linked-resources").toggle();
+    if ($("#linked-resources").css("display")=="block") {
+            $("#toggleLinked").html("<i class='fa fa-minus'></i>");
+        } else {
+            $("#toggleLinked").html("<i class='fa fa-plus'></i>");
+        }
+}
+
+</script>

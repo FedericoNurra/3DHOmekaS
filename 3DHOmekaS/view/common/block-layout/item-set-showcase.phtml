@@ -1,0 +1,50 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var \Omeka\Api\Representation\ItemSetRepresentation[] $itemSets
+ * @var string $thumbnailType
+ * @var string $showTitleOption
+ * @var string $heading
+ */
+
+$plugins = $this->getHelperPluginManager();
+$thumbnail = $plugins->get('thumbnail');
+
+$defaultThumbnail = $this->assetUrl('thumbnails/default.png', 'Omeka');
+$defaultThumbnail = '<img src="' . $defaultThumbnail . '"/>';
+?>
+<div class="itemSetContainer">
+<?php if (!empty($heading)): ?>
+<h3><?= $heading ?></h3>
+<?php endif; ?>
+
+<div class="block item-set-showcase">
+
+<br>
+    <?php
+    foreach ($itemSets as $itemSet):
+        $render = null;
+        $title = null;
+        $link = null;
+
+        $itemSetThumbnail = $thumbnail($itemSet, $thumbnailType) ?: $defaultThumbnail;
+        $render = $itemSet->linkRaw($itemSetThumbnail);
+
+        if ($showTitleOption !== 'no_title'):
+            $title = $itemSet->displayTitle();
+            $link = $itemSet->link($title);
+        endif;
+    ?>
+    <div class="item-set resource itemSetCustom">
+        <h4>
+        <?= $render ?>
+        <?= $link ?>
+<!--        <div class="caption">
+            <?= $itemSet->displayDescription() ?>
+        </div> -->
+        </h4>
+    </div>
+<?php endforeach; ?>
+</div>
+</div>

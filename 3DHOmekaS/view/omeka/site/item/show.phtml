@@ -1,0 +1,28 @@
+<?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+
+// body attributes
+
+$this->htmlElement('body')->appendAttribute('class', 'item resource show');
+
+// header creation
+
+// media identification
+
+$lightMedia = [];
+$otherMedia = [];
+foreach ($item->media() as $media) {
+    $mediaType = $media->mediaType();
+    $mediaRenderer = $media->renderer();
+    if ((strpos($mediaType, 'image/') !== false) || (strpos($mediaRenderer, 'youtube') !== false)) {
+        $lightMedia[] = $media;
+    } else {
+        $otherMedia[] = $media;
+    }
+}
+?>
+<?php $this->trigger('view.show.before'); ?>
+
+<?php $template = 'omeka/site/item/show-default.phtml'; ?>
+<?= $this->partial($template, $this->vars()) ?>

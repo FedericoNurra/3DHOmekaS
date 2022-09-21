@@ -1,0 +1,116 @@
+<?php
+$escape = $this->plugin('escapeHtml');
+$siteTitle = $site->title();
+$this->htmlElement('html')->setAttribute('lang', $this->lang());
+$this->headMeta()->setCharset('utf-8');
+$this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1');
+$this->headTitle($siteTitle)->setSeparator(' · ');
+$this->headTitle()->append($this->setting('installation_title', 'Omeka S'));
+$this->headLink()->appendStylesheet($this->assetUrl('css/3dhop.css'));
+$this->headLink()->prependStylesheet($this->assetUrl('css/iconfonts.css', 'Omeka'));
+$this->headLink()->appendStylesheet($this->assetUrl('css/style.css'));
+$this->headLink()->appendStylesheet($this->assetUrl('css/testStyle.css'));
+$this->headLink()->appendStylesheet($this->assetUrl('css/nav.css'));
+$this->headLink()->appendStylesheet($this->assetUrl('css/w3.css'));
+$this->headLink()->appendStylesheet($this->assetUrl('css/all.css'));
+$this->headScript()->appendFile($this->assetUrl('js/all.js'));
+$this->headScript()->appendFile($this->assetUrl('js/jquery.js'));
+$this->headScript()->appendFile($this->assetUrl('js/spidergl.js'));
+$this->headScript()->appendFile($this->assetUrl('js/presenter.js'));
+$this->headScript()->appendFile($this->assetUrl('js/nexus.js'));
+$this->headScript()->appendFile($this->assetUrl('js/ply.js'));
+$this->headScript()->appendFile($this->assetUrl('js/trackball_sphere.js'));
+$this->headScript()->appendFile($this->assetUrl('js/trackball_turntable.js'));
+$this->headScript()->appendFile($this->assetUrl('js/trackball_turntable_pan.js'));
+$this->headScript()->appendFile($this->assetUrl('js/trackball_pantilt.js'));
+$this->headScript()->appendFile($this->assetUrl('js/init.js'));
+$this->headScript()->appendFile($this->assetUrl('js/earcut.min.js'));
+$this->headScript()->prependFile($this->assetUrl('js/report3d.js'));
+$this->headScript()->prependFile($this->assetUrl('js/global.js', 'Omeka'));
+$this->headScript()->prependFile($this->assetUrl('vendor/jquery/jquery.min.js', 'Omeka'));
+$this->trigger('view.layout');
+$userBar = $this->userBar();
+?>
+<?php echo $this->doctype(); ?>
+<?php echo $this->htmlElement('html'); ?>
+    <head>
+        <?php echo $this->headMeta(); ?>
+        <?php echo $this->headTitle(); ?>
+        <?php echo $this->headLink(); ?>
+        <?php echo $this->headStyle(); ?>
+        <?php echo $this->headScript(); ?>
+        <link rel="icon" href="<?php echo ($this->assetUrl('/img/AIR_192.gif')); ?>" type="image/gif" />
+    </head>
+    <?php echo $this->htmlElement('body'); ?>
+        <a id="skipnav" href="#content"><?php echo $this->translate('Skip to main content'); ?></a>
+        <?php echo $userBar; ?>
+        <header>
+                <?php if ($this->themeSetting('logo')): ?>
+                <a href="<?php echo $site->url(); ?>" class="site-title"><img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" title="Logo"></a>
+                <?php else: ?>
+                    <div class="headerTitle"><table class="logos"><tr><td><a href="<?php echo $site->url(); ?>" class="site-title"><?php echo $this->pageTitle($site->title()); ?></a></td></tr></table></div>
+                <?php endif; ?>
+                <div class="nav-toggle">
+                    <div class="nav-toggle-bar"></div>
+                </div>
+                <nav class="main-navigation">
+                <?php
+                echo $site->publicNav()->menu()->renderMenu(null, [
+                    'maxDepth' => $this->themeSetting('nav_depth') - 1
+                ]);
+                ?>
+                </nav>
+            </header>
+
+        <div id="wrap">
+            <div id="content" role="main">
+                <?php echo $this->content; ?>
+            </div>
+            <footer>
+                <button onclick="topFunction()" id="buttonTop" class="topButton" title="Haut de page"><span class="legend"><i class="fas fa-arrow-up"></i></span></button>
+                <nav class="footerLinks">
+                    <ul>
+                        <li><a href="#">Insert Link 1</a></li>
+                        <li><a href="#">Insert Link 2</a></li>
+                        <li><a href="#">Insert Link 3</a></li>
+                        <li><a href="#">Insert Link 4</a></li>
+                    </ul>
+                </nav>
+                <div class="onlyMobile"><table class="logos"><tr></tr></table></div>
+            </footer>
+        </div>
+        <script>
+        window.onscroll = function() {scrollFunction()};
+            function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                document.getElementById("buttonTop").style.display = "block";
+            } else {
+                document.getElementById("buttonTop").style.display = "none";
+                }
+            }
+            function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+            }
+        </script>
+        <script>
+            (function() {
+                var hamburger = {
+                    navToggle: document.querySelector('.nav-toggle'),
+                    nav: document.querySelector('nav'),
+                    doToggle: function(e) {
+//                        e.preventDefault();
+                        this.navToggle.classList.toggle('expanded');
+                        this.nav.classList.toggle('expanded');
+                    }
+                };
+                hamburger.navToggle.addEventListener('click', function(e) {
+                    hamburger.doToggle(e);
+                });
+                hamburger.nav.addEventListener('click', function(e) {
+                    hamburger.doToggle(e);
+                });
+            }());
+        </script>
+        </body>
+</html>
