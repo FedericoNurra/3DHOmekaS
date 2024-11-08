@@ -1,0 +1,24 @@
+<?php
+$summary = $showSummary ? $site->summary() : null;
+?>
+<li class="newSite">
+<div class="wrapSite">
+    <h2 class="siteTitle"><?php echo $this->hyperlink($site->title(), $site->siteUrl(), ['class' => 'site-link']); ?></h2>
+    <?php 
+    $slug = $site->siteUrl();
+    $cutSlug = substr($slug, 3);
+    $siteImg = "https://omeka.ht.lu.se/themes/Report3D/asset/img/" . $cutSlug . ".jpg"; 
+    $array = get_headers($siteImg);
+    $string = $array[0];
+    if (strpos($string,"200")) {
+    echo "<img class='imgSite' draggable='false' src='".$siteImg."' style='object-position: center' width='100%' />";
+    } else {
+        echo "<img class='imgSite' draggable='false' src='".$this->assetUrl('img/AIR_logo.png')."' style='object-position: center' width='100%' />";
+    }
+    ?> 
+    <?php if ($summary): ?>
+    <div class="divSummary"><p class="site-summary"><?php echo nl2br($this->escapeHtml($summary)); ?></p></div>
+    <br>
+    <?php endif; ?>
+    </div>
+</li>

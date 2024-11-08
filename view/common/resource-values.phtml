@@ -1,0 +1,154 @@
+<?php
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+
+if ($this->status()->isSiteRequest()) {
+    $labelInfo = $this->siteSetting('property_label_information');
+    $showLocale = (bool) $this->siteSetting('show_locale_label', true);
+    $filterLocale = $this->siteSetting('filter_locale_values');
+    $lang = $this->lang();
+    $showValueAnnotations = (bool) $this->siteSetting('show_value_annotations', true);
+} else {
+    $labelInfo = $this->setting('property_label_information');
+    $showLocale = true;
+    $filterLocale = false;
+    $lang = null;
+    $showValueAnnotations = true;
+}
+$filterLocaleCallback = function ($value) use ($lang) {
+    $valueLang = $value->lang();
+    return $valueLang == '' || strcasecmp($valueLang, $lang) === 0;
+};
+?>
+
+<dl>
+
+
+<?php foreach ($values as $term => $propertyData): ?>
+    <?php if ($term == "CRMarchaeo:AP21_contains" || $term == "air:is_above" || $term == "air:is_below" || $term == "cidoc-crm:P89i_contains" || $term == "cidoc-crm:P138i_has_representation" || $term == "cidoc-crm:P14_carried_out_by" || $term == "CRMarchaeo:AP3_excavated" || $term == "CRMarchaeo:AP19i_contains_embedding" || $term == "cidoc-crm:P53i_is_former_or_current_location_of" || $term == "cidoc-crm:P46_is_composed_of"): ?>
+        <div class="property">
+        <div class="accordion border-0" id="accordionResource" style="width: 100%;">
+            <div class="accordion-item border-0">
+                <h4 class="fw-bold" id="heading" style="color:darkred">
+                    <button class="accordion-button accordion-flush collapsed ps-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $term; ?>" aria-expanded="true" aria-controls="collapse<?php echo $term; ?>"  style="color:darkred">
+                    <?php if ($propertyData['alternate_label']): ?>
+                    <?php echo $escape($propertyData['alternate_label']); ?>
+                    <?php else: ?>
+                    <?php echo $escape($translate($propertyData['property']->label())); ?>
+                    <?php endif; ?>
+                    <?php if ('term' === $labelInfo): ?>
+                        <span class="field-term">(<?php echo $escape($propertyData['property']->term()); ?>)</span>
+                    <?php elseif ('vocab' === $labelInfo): ?>
+                        <span class="field-term">(<?php echo $escape($propertyData['property']->vocabulary()->label()); ?>)</span>
+                    <?php endif; ?>
+                    </button>
+                </h4>
+                <div id="collapse<?php echo $term; ?>" class="accordion-collapse collapse" aria-labelledby="headingSurface<?php echo $term; ?>">
+                    <div class="accordion-body p-0">
+                        <div class="values ps-2" style="font-family: 'Crimson'; font-size: 18px;">
+                        <?php foreach ($propertyData['values'] as $value): ?>
+                        <?php
+                        $valueType = $value->type();
+                        $valueLang = $value->lang();
+                        $valueAnnotation = $value->valueAnnotation();
+                        $class = ['value'];
+                        if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
+                            $class[] = 'resource';
+                            $class[] = $escape($value->valueResource()->resourceName());
+                        } elseif ('uri' == $valueType) {
+                            $class[] = 'uri';
+                        }
+                        ?>
+                        <?php
+                        $valueType = $value->type();
+                        $class = ['value'];
+                        if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
+                            $class[] = 'resource';
+                            $class[] = $value->valueResource()->displayTitle();
+                        } elseif ('uri' == $valueType) {
+                            $class[] = 'uri';
+                        }
+                        ?>
+                        <?php if(!$value->isPublic()): ?>
+                            <span class="o-icon-private" aria-role="tooltip" title="<?php echo $this->escapeHtml($translate('Private')); ?>" aria-label="<?php echo $this->escapeHtml($translate('Private')); ?>"></span>
+                        <?php endif; ?>
+
+                        <div class="<?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
+                        <?php if ($language = $value->lang()): ?>
+                        <span class="language"><?php echo $language; ?></span>
+                        <?php endif; ?>
+                        <?php echo $value->asHtml(); ?>
+
+                        </div>
+                        <?php if ($valueAnnotation && $showValueAnnotations): ?>
+                        <div style="display:block;padding-left:30px" class="collapsible annotation">
+                        <?php echo $valueAnnotation->displayValues(); ?>
+                        </div>
+                        <?php endif; ?>
+
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <?php else: ?> 
+    <div class="property">
+        <h4 class="fw-bold">
+        <?php if ($propertyData['alternate_label']): ?>
+        <?php echo $escape($propertyData['alternate_label']); ?>
+        <?php else: ?>
+        <?php echo $escape($translate($propertyData['property']->label())); ?>
+        <?php endif; ?>
+        <?php if ('term' === $labelInfo): ?>
+        <span class="field-term">(<?php echo $escape($propertyData['property']->term()); ?>)</span>
+        <?php elseif ('vocab' === $labelInfo): ?>
+        <span class="field-term">(<?php echo $escape($propertyData['property']->vocabulary()->label()); ?>)</span>
+        <?php endif; ?>
+        </h4>
+        <div class="values">
+        <?php foreach ($propertyData['values'] as $value): ?>
+        <?php
+        $valueType = $value->type();
+        $valueLang = $value->lang();
+        $valueAnnotation = $value->valueAnnotation();
+        $class = ['value'];
+        if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
+            $class[] = 'resource';
+            $class[] = $escape($value->valueResource()->resourceName());
+        } elseif ('uri' == $valueType) {
+            $class[] = 'uri';
+        }
+        ?>
+            <?php
+            $valueType = $value->type();
+            $class = ['value'];
+            if ('resource' == $valueType || strpos($valueType, 'resource') !== false) {
+                $class[] = 'resource';
+                $class[] = $value->valueResource()->displayTitle();
+            } elseif ('uri' == $valueType) {
+                $class[] = 'uri';
+            }
+            ?>
+            <?php if(!$value->isPublic()): ?>
+                <span class="o-icon-private" aria-role="tooltip" title="<?php echo $this->escapeHtml($translate('Private')); ?>" aria-label="<?php echo $this->escapeHtml($translate('Private')); ?>"></span>
+            <?php endif; ?>
+
+            <div class="<?php echo implode(' ', $class); ?>" lang="<?php echo $escape($value->lang()); ?>">
+                <?php if ($language = $value->lang()): ?>
+                <span class="language"><?php echo $language; ?></span>
+                <?php endif; ?>
+                <?php echo $value->asHtml(); ?>
+            </div>
+            <?php if ($valueAnnotation && $showValueAnnotations): ?>
+                <div style="display:block;padding-left:30px" class="collapsible annotation">
+                    <?php echo $valueAnnotation->displayValues(); ?>
+                </div>
+            <?php endif; ?>
+
+        <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+<?php endforeach; ?>

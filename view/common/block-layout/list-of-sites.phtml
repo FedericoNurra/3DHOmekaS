@@ -1,0 +1,16 @@
+<div class="newListOfSites">
+    <div class="newSiteList">
+    <ul class='newUlSiteList'>
+        <?php
+        foreach($sites as $site):
+            echo $this->partial('common/site-list-entry', ['site' => $site, 'showSummary' => $summaries]);
+        endforeach;
+        ?>
+        </ul>
+    </div>
+    <?php
+    if ($pagination):
+        echo $this->pagination();
+    endif;
+    ?>
+</div>
